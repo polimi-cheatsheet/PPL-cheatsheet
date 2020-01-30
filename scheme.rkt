@@ -22,6 +22,9 @@
       (min x (minimum rest))))
 (minimum2 4 2 1 5) ; => 1
 
+; Note on functions: parameters are passed by
+; reference like in Java
+
 ; let binding
 (let ((x 10) (y 15))
   (+ x y))
@@ -40,11 +43,14 @@
 ; lists
 (define l1 '(1 2 3))
 (define l2 (cons 1 (cons 2 (cons 3 '())))) ; => '(1 2 3)
+(member 2 '(1 2 3)) ; => '(2 3)
 (car l1) ; => 1
 (cdr l1) ; => '(2 3)
 (apply + '(1 2 3 4)) ; => 10
 (null? l1) ; => #f
 (null? '()) ; => #t
+
+; mutable lists with mcons, set-mcar!, set-mcdr!
 
 ; if-else
 (if (= (+ 1 2) 3) 42 24) ; => 42
@@ -58,7 +64,7 @@
 (eqv? 42 42) ; => #t
 (equal? '(1 2 3) '(1 2 3)) ; => #t
 
-(case (car '(c d))
+(case (car '(c d)) ; case uses eqv?
   ((a e i o u) 'vowel)
   (else 'consonant)) ; => 'consonant
 (cond ((> 3 3) 'greater)
@@ -78,6 +84,14 @@
 (vector-ref vec 1) ; => 2
 (vector-set! vec 1 42) ; => #(1 42 3)
 (vector-length vec) ; => 3
+; vector-for-each
+(define (vector-for-each body vect)
+    (let ((len (vector-length vect)))
+        (let loop ((i 0))
+            (when (< i len)
+                (body (vector-ref vect i))
+                (loop (+ i 1))))))
+(vector-for-each (lambda (x) (display x)) vec) ; => 123
 
 ; structs
 (struct being
@@ -127,6 +141,21 @@
          (begin
            body ...
            (loop)))))))
+(define-syntax my-let*
+    (syntax-rules ()
+    ;; base (= only one variable )
+    ((_ (( var val )) istr ...)
+        ((lambda (var) istr ...)
+        val))
+    ;; more than one
+    ((_ ((var val) . rest) istr ...)
+        ((lambda (var)
+            (my-let* rest istr ...))
+        val))))
+(define-syntax my-let
+    (syntax-rules ()
+        ((_ ((var expr) ...) body ...)
+        ((lambda (var ...) body ...) expr ...))))
 (define-syntax For
   (syntax-rules (from to do) ; extra keyword
     ((_ var from min to max do body ...)
