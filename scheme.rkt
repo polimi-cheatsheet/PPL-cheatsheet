@@ -301,3 +301,14 @@
 ; (fst 3 (infinity)) ; => doesn't terminate
 (force (fst 3 lazy-inf)) ; => 3
 (fst 3 lazy-inf) ; => 3
+
+; Currying
+(define (sum-square x)
+  (lambda (y)
+    (+ (* x x) (* y y))))
+
+(define ((sum-square2 x) y)
+  (+ (* x x) (* y y)))
+
+((sum-square 1) 2) ; => 5
+((sum-square2 2) 3) ; => 13
