@@ -19,6 +19,7 @@ lambda = \x y -> 1+x+y
 
 -- Lists
 l = [1,2,3]
+elem 2 l -- => True
 l2 = [4,5,6]
 l3 = l ++ l2 -- => [1,2,3,4,5,6]
 h = head [1,2,3] -- => 1
@@ -50,9 +51,9 @@ class Listoid l where
     listoidlast :: l a -> a
     listoidrest :: l a -> l a
 data LL a = Head a (LL a) | Node a (LL a) | Tail a deriving Show
-lconcat (Tail a) (Head l xs) = Head l (Node a xs)
-lconcat (Node a xs1) r@(Head l xs2) = Head l (Node a (lconcat xs1 r))
-lconcat (Head _ xs1) r = lconcat xs1 r
+lconcat (Tail a) (Head l xs) = Node a xs
+lconcat (Node a xs1) r = Node a (lconcat xs1 r)
+lconcat (Head _ xs1) r@(Head l xs2) = Head l (lconcat xs1 r)
 
 instance Listoid LL where
     listoidcons a (Head l xs) = Head l (Node a xs)
@@ -155,6 +156,11 @@ instance Show a => Show (Tree a) where
 --          n = insert "rust" 99 m
 --          o = insert "nose" 9 n
 --      in (m ! "emerald", n ! "rust", o ! "nose") -- (27,99,9)
+-- Arrays
+-- exarr = let m = listArray (1, 3) ["alpha", "beta", "gamma"]
+--             n = m // [(2, "Beta")]
+--             o = n // [(1, "Alpha"), (3, "Gamma")]
+--             in (m ! 1, n ! 2, o ! 1) -- ("alpha", "Beta", "Alpha")
 -- // is for update/insert m // [(1, "Alpha")]
 
 -- Foldable: a type that can be used with foldr
