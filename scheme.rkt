@@ -269,41 +269,35 @@
 (--> Glenn hello)
 ; (--> Glenn boh) ; => error: Unknown message boh
 
+; Implementation of call-by-need
+; promise
+(struct promise (
+    proc
+    value?
+    ) #:mutable)
 
+; delay (macro since we must not evaluate expr)
+(define-syntax delay
+  (syntax-rules ()
+    ((_ (expr ...))
+     (promise (lambda () (expr ...))
+              #f))))
 
+; force evaluation
+(define (force prom)
+  (cond
+    ((not (promise? prom)) prom)
+    ((promise-value? prom) (promise-proc prom))
+    (else
+      (set-promise-proc! prom ((promise-proc prom)))
+      (set-promise-value?! prom #t)
+      (promise-proc prom))))
 
+(define (infinity)
+  (+ 1 (infinity)))
+(define lazy-inf (delay (infinity)))
+(define (fst x y) x)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+; (fst 3 (infinity)) ; => doesn't terminate
+(force (fst 3 lazy-inf)) ; => 3
+(fst 3 lazy-inf) ; => 3
