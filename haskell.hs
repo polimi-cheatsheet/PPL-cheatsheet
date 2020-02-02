@@ -164,6 +164,8 @@ instance Show a => Show (Tree a) where
 -- // is for update/insert m // [(1, "Alpha")]
 
 -- Foldable: a type that can be used with foldr
+-- Only foldr needed
+-- foldl f a bs = (foldr (\b g x -> g (f x b)) id bs) a
 instance Foldable Tree where
     foldr f z (Leaf x) = f x z
     foldr f z (Branch l r) = foldr f (foldr f z r) l
