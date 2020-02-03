@@ -167,11 +167,13 @@ instance Show a => Show (Tree a) where
 -- Only foldr needed
 -- foldl f a bs = (foldr (\b g x -> g (f x b)) id bs) a
 instance Foldable Tree where
+    foldr f z Empty = z
     foldr f z (Leaf x) = f x z
     foldr f z (Branch l r) = foldr f (foldr f z r) l
 
 -- Functor: a type that can be mapped
 instance Functor Tree where
+    fmap f Empty = Empty
     fmap f (Leaf x) = Leaf (f x)
     fmap f (Branch l r) = Branch (fmap f l) (fmap f r)
 -- functor laws:
