@@ -49,6 +49,16 @@
 (apply + '(1 2 3 4)) ; => 10
 (null? l1) ; => #f
 (null? '()) ; => #t
+(list 1 2 3 4) ; => '(1 2 3 4)
+(list* 1 2 3 (list* 4 5 6)) ; => '(1 2 3 4 5 6)
+(length l1) ; => 3
+(list-ref l1 2) ; => 3
+(append l1 l1 l1) ; => '(1 2 3 1 2 3 1 2 3)
+(reverse l1) ; => '(3 2 1)
+(take '(5 8 4 1) 2) ; => '(5 8)
+(range 5) ; => '(0 1 2 3 4)
+(range 2 5) ; => '(2 3 4)
+(range 2 10 2) ; => '(2 4 6 8)
 
 ; mutable lists with mcons, set-mcar!, set-mcdr!
 
@@ -118,7 +128,9 @@
 ; useful functions
 (map (lambda (x) (+ x 5)) '(1 2 3)) ; => '(6 7 8)
 (filter (lambda (x) (>= x 10)) '(1 10 100)) ; => '(10 100)
+; (foldl f i L) = f(L_n, f(L_2, f(L_1, i)))
 (foldl cons '() '(1 2 3)) ; => '(3 2 1)
+; (foldr f i L) = f(L_1, f(L_2, F(L_n, i)))
 (foldr cons '() '(1 2 3)) ; => '(1 2 3)
 (foldl * 1 '(1 2 3 4)) ; => 24
 ; apply f first to the first, going from the left

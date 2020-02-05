@@ -19,6 +19,8 @@
 % filter(Pred, List1) -> List2
 %     lists:filter(fun(X) -> X =< 3 end, [3, 1, 4, 1, 6]). % Result is [3,1,1]
 % flatten(DeepList) -> List -- Returns a flattened version of DeepList.
+% foldl(F, I, L) = F(L_n, ... F(L_2, F(L_1, I)))
+% foldr(F, I, L) = F(L_1, F(L_2, ... F(L_n, I)))
 % foldl(Fun, Acc0, List) -> Acc1
 %     Example: lists:foldl(fun(X, Y) -> X + 10 * Y end, 0, [1, 2, 3]). % Result is 123
 % foreach(Fun, List) -> void()
@@ -117,6 +119,7 @@ lambda2() ->
     lists:foldr(fun add/2, 0, [1,2,3]). % => 6
 
 % Processes and messages
+% Between 2 processes there is FIFO ordering of messages
 actor1() ->
     Pid2 = spawn(?MODULE, actor2, []),
     Pid2 ! {self(), foo}.
