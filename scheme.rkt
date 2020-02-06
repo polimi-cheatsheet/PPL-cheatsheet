@@ -191,6 +191,61 @@
 (other-cont) ; => 3
 (saved-cont) ; => 2
 
+; exception handling with continuations
+; handlers
+(define *handlers* (list))
+; push new handler
+(define (push-handler proc)
+    (set! *handlers* (cons proc *handlers*)))
+; pop handler
+(define (pop-handler)
+    (let ((h (car *handlers*)))
+        (set! *handlers* (cdr *handlers*))
+        h))
+; throw
+(define (throw x)
+    (if (pair? *handlers*)
+        ((pop-handler) x)
+        (apply error x)))
+; try catch (macro)
+(define-syntax try
+    (syntax-rules ( catch )
+        ((_ exp1 ...
+            (catch what hand ...))
+        (call/cc (lambda (exit)
+            ; install the handler
+            (push-handler (lambda (x)
+                (if (equal? x what)
+                    (exit
+                        (begin
+                            hand ...))
+                    (throw x))))
+            (let ((res ;; evaluate the body
+                (begin exp1 ...)))
+                ; ok : discard the handler
+                (pop-handler)
+                res))))))
+; example
+(define (foo x)
+    (display x) (newline)
+    (throw "hello"))
+(try
+    (display "Before foo")
+    (newline)
+    (foo "hi !")
+    (display "After foo") ; unreached code
+    (catch "hello"
+        ;this is the handler block
+        (display "I caught a throw.") (newline)
+        #f))
+; it prints:
+;
+; Before foo
+; hi !
+; I caught a throw.
+;
+; and returns #f
+
 ; closure as objects
 (define (make-simple-object)
   (let ((my-var 0))  ; attributes
